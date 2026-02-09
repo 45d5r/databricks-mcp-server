@@ -2,6 +2,7 @@
 
 <!-- mcp-name: io.github.pramodbhatofficial/databricks-sdk-mcp -->
 
+[![PyPI](https://img.shields.io/pypi/v/databricks-sdk-mcp.svg)](https://pypi.org/project/databricks-sdk-mcp/)
 [![CI](https://github.com/pramodbhatofficial/databricks-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/pramodbhatofficial/databricks-mcp-server/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
