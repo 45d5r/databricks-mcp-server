@@ -432,3 +432,131 @@ def register_tools(mcp: FastMCP) -> None:
             return to_json(result)
         except Exception as e:
             return format_error(e)
+
+    @mcp.tool()
+    def databricks_update_catalog(name: str, comment: str = "", owner: str = "") -> str:
+        """Update properties of an existing catalog.
+
+        The caller must be the catalog owner or a metastore admin.
+        Only non-empty fields are updated; other fields remain unchanged.
+
+        Args:
+            name: Name of the catalog to update.
+            comment: Optional new description for the catalog. If empty,
+                     the comment is not changed.
+            owner: Optional new owner for the catalog. If empty, the
+                   owner is not changed.
+
+        Returns:
+            JSON object with the updated catalog's details.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {}
+            if comment:
+                kwargs["comment"] = comment
+            if owner:
+                kwargs["owner"] = owner
+            if not kwargs:
+                return to_json({
+                    "status": "no_change",
+                    "message": "No fields provided to update. Specify comment and/or owner.",
+                })
+            result = w.catalogs.update(name, **kwargs)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_update_schema(full_name: str, comment: str = "", owner: str = "") -> str:
+        """Update properties of an existing schema.
+
+        The caller must be the schema owner or an owner of the parent catalog.
+        Only non-empty fields are updated; other fields remain unchanged.
+
+        Args:
+            full_name: Full name of the schema in "catalog.schema" format
+                       (e.g. "my_catalog.my_schema").
+            comment: Optional new description for the schema. If empty,
+                     the comment is not changed.
+            owner: Optional new owner for the schema. If empty, the
+                   owner is not changed.
+
+        Returns:
+            JSON object with the updated schema's details.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {}
+            if comment:
+                kwargs["comment"] = comment
+            if owner:
+                kwargs["owner"] = owner
+            if not kwargs:
+                return to_json({
+                    "status": "no_change",
+                    "message": "No fields provided to update. Specify comment and/or owner.",
+                })
+            result = w.schemas.update(full_name, **kwargs)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_create_registered_model(
+        name: str,
+        catalog_name: str,
+        schema_name: str,
+        comment: str = "",
+    ) -> str:
+        """Create a new registered model in Unity Catalog.
+
+        Registered models are containers for ML model versions. They live
+        within a catalog and schema, and each version can be served via
+        a model serving endpoint.
+
+        Args:
+            name: Name for the new registered model.
+            catalog_name: Name of the parent catalog.
+            schema_name: Name of the parent schema.
+            comment: Optional human-readable description of the model.
+
+        Returns:
+            JSON object with the created registered model's details.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {
+                "name": name,
+                "catalog_name": catalog_name,
+                "schema_name": schema_name,
+            }
+            if comment:
+                kwargs["comment"] = comment
+            result = w.registered_models.create(**kwargs)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_delete_registered_model(full_name: str) -> str:
+        """Delete a registered model from Unity Catalog.
+
+        Permanently removes the registered model and all its versions.
+        The caller must be the model owner or a metastore admin.
+        This action cannot be undone.
+
+        Args:
+            full_name: Full three-level name of the registered model in
+                       "catalog.schema.model" format
+                       (e.g. "my_catalog.my_schema.my_model").
+
+        Returns:
+            Confirmation message on success.
+        """
+        try:
+            w = get_workspace_client()
+            w.registered_models.delete(full_name)
+            return f"Registered model '{full_name}' deleted successfully."
+        except Exception as e:
+            return format_error(e)

@@ -261,3 +261,27 @@ def register_tools(mcp: FastMCP) -> None:
             return to_json({"model": full_model_name, "versions": versions, "count": len(versions)})
         except Exception as e:
             return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_serving_endpoint_openapi(name: str) -> str:
+        """Get the OpenAPI specification for a serving endpoint.
+
+        Retrieves the auto-generated OpenAPI spec that describes the REST
+        API for querying the endpoint. Useful for understanding the expected
+        input/output schema of the served model.
+
+        This method may not be available in all SDK versions; if unavailable,
+        an informative error is returned.
+
+        Args:
+            name: Name of the serving endpoint.
+        """
+        try:
+            w = get_workspace_client()
+            if hasattr(w.serving_endpoints, 'get_open_api'):
+                result = w.serving_endpoints.get_open_api(name=name)
+                return to_json(result)
+            else:
+                return format_error(Exception("get_open_api not available in this SDK version"))
+        except Exception as e:
+            return format_error(e)

@@ -263,3 +263,209 @@ def register_tools(mcp: FastMCP) -> None:
             return to_json(results)
         except Exception as e:
             return format_error(e)
+
+    @mcp.tool()
+    def databricks_edit_cluster(
+        cluster_id: str,
+        cluster_name: str,
+        spark_version: str,
+        node_type_id: str,
+        num_workers: int = 0,
+    ) -> str:
+        """Edit the configuration of an existing compute cluster.
+
+        Updates the cluster definition. The cluster may be restarted to apply
+        changes if it is currently running. This call returns immediately
+        without blocking.
+
+        Args:
+            cluster_id: The unique identifier of the cluster to edit.
+            cluster_name: New display name for the cluster.
+            spark_version: Spark runtime version string
+                           (e.g. "14.3.x-scala2.12", "15.0.x-scala2.12").
+            node_type_id: Instance type for worker nodes
+                          (e.g. "i3.xlarge", "Standard_DS3_v2").
+            num_workers: Number of worker nodes. Use 0 for a single-node
+                         cluster (driver only). Defaults to 0.
+
+        Returns:
+            Confirmation that the cluster edit was initiated.
+        """
+        try:
+            w = get_workspace_client()
+            w.clusters.edit(
+                cluster_id=cluster_id,
+                cluster_name=cluster_name,
+                spark_version=spark_version,
+                node_type_id=node_type_id,
+                num_workers=num_workers,
+            )
+            return f"Cluster '{cluster_id}' edit initiated with name '{cluster_name}'."
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_pin_cluster(cluster_id: str) -> str:
+        """Pin a compute cluster to prevent it from being auto-deleted.
+
+        Pinned clusters are retained even after being terminated for an
+        extended period. This is useful for clusters that are used
+        intermittently but should not be cleaned up.
+
+        Args:
+            cluster_id: The unique identifier of the cluster to pin.
+
+        Returns:
+            Confirmation that the cluster has been pinned.
+        """
+        try:
+            w = get_workspace_client()
+            w.clusters.pin(cluster_id=cluster_id)
+            return f"Cluster '{cluster_id}' has been pinned."
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_unpin_cluster(cluster_id: str) -> str:
+        """Unpin a compute cluster, allowing it to be auto-deleted.
+
+        Removes the pin from a cluster so that it follows the normal
+        auto-deletion policy for terminated clusters.
+
+        Args:
+            cluster_id: The unique identifier of the cluster to unpin.
+
+        Returns:
+            Confirmation that the cluster has been unpinned.
+        """
+        try:
+            w = get_workspace_client()
+            w.clusters.unpin(cluster_id=cluster_id)
+            return f"Cluster '{cluster_id}' has been unpinned."
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_list_cluster_events(cluster_id: str, limit: int = 50) -> str:
+        """List recent events for a compute cluster.
+
+        Returns events such as creation, configuration changes, state
+        transitions, and errors. Useful for auditing and troubleshooting
+        cluster behavior.
+
+        Args:
+            cluster_id: The unique identifier of the cluster.
+            limit: Maximum number of events to return. Defaults to 50.
+
+        Returns:
+            JSON object with an array of cluster event objects, each
+            containing timestamp, type, and details.
+        """
+        try:
+            w = get_workspace_client()
+            events = paginate(w.clusters.events(cluster_id=cluster_id), max_items=limit)
+            return to_json({"cluster_id": cluster_id, "events": events, "count": len(events)})
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_list_node_types() -> str:
+        """List all available node types for compute clusters.
+
+        Returns the available instance types that can be used as worker
+        or driver nodes when creating or editing clusters. Each entry
+        includes instance type ID, memory, CPU cores, and availability.
+
+        Returns:
+            JSON object with available node types and their specifications.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.clusters.list_node_types()
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_list_spark_versions() -> str:
+        """List all available Spark runtime versions.
+
+        Returns the Spark versions available for creating or editing clusters.
+        Each entry includes the version key (used in cluster configuration)
+        and a human-readable name.
+
+        Returns:
+            JSON object with available Spark versions and their display names.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.clusters.spark_versions()
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_create_instance_pool(
+        instance_pool_name: str,
+        node_type_id: str,
+        min_idle_instances: int = 0,
+        max_capacity: int = 0,
+        idle_instance_autotermination_minutes: int = 60,
+    ) -> str:
+        """Create a new instance pool.
+
+        Instance pools reduce cluster start and auto-scaling times by
+        maintaining a set of idle, ready-to-use cloud instances. Clusters
+        can be configured to use an instance pool for faster provisioning.
+
+        Args:
+            instance_pool_name: Display name for the instance pool.
+            node_type_id: Instance type for pool instances
+                          (e.g. "i3.xlarge", "Standard_DS3_v2").
+            min_idle_instances: Minimum number of idle instances to maintain
+                                in the pool. Defaults to 0.
+            max_capacity: Maximum total instances the pool can hold (idle +
+                          in-use). Set to 0 for no limit. Defaults to 0.
+            idle_instance_autotermination_minutes: Minutes before idle instances
+                                                   are terminated. Defaults to 60.
+
+        Returns:
+            JSON object with the created instance pool's details including
+            instance_pool_id.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {
+                "instance_pool_name": instance_pool_name,
+                "node_type_id": node_type_id,
+                "min_idle_instances": min_idle_instances,
+                "idle_instance_autotermination_minutes": idle_instance_autotermination_minutes,
+            }
+            if max_capacity > 0:
+                kwargs["max_capacity"] = max_capacity
+            result = w.instance_pools.create(**kwargs)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_delete_instance_pool(instance_pool_id: str) -> str:
+        """Delete an instance pool.
+
+        Permanently removes the instance pool and terminates all idle
+        instances. Clusters currently using this pool are not affected
+        but will not be able to scale using the pool after deletion.
+
+        Args:
+            instance_pool_id: The unique identifier of the instance pool
+                              to delete.
+
+        Returns:
+            Confirmation message on success.
+        """
+        try:
+            w = get_workspace_client()
+            w.instance_pools.delete(instance_pool_id=instance_pool_id)
+            return f"Instance pool '{instance_pool_id}' deleted successfully."
+        except Exception as e:
+            return format_error(e)

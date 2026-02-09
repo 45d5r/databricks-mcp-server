@@ -285,3 +285,32 @@ def register_tools(mcp: FastMCP) -> None:
             return to_json(result)
         except Exception as e:
             return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_published_dashboard(dashboard_id: str) -> str:
+        """Get the published version of a Lakeview dashboard.
+
+        Retrieves the published (live) version of a dashboard, which may
+        differ from the current draft. Returns the published dashboard's
+        configuration, embed credentials setting, and warehouse binding.
+
+        This method may not be available in all SDK versions; if unavailable,
+        an informative error is returned.
+
+        Args:
+            dashboard_id: The UUID identifying the dashboard whose published
+                          version to retrieve.
+
+        Returns:
+            JSON object with the published dashboard details including
+            embed_credentials, warehouse_id, and publish timestamp.
+        """
+        try:
+            w = get_workspace_client()
+            if hasattr(w.lakeview, 'get_published'):
+                result = w.lakeview.get_published(dashboard_id=dashboard_id)
+                return to_json(result)
+            else:
+                return format_error(Exception("get_published not available in this SDK version"))
+        except Exception as e:
+            return format_error(e)

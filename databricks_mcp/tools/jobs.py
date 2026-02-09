@@ -10,6 +10,8 @@ by schedule, or via API.
 
 from __future__ import annotations
 
+import json
+
 from mcp.server.fastmcp import FastMCP
 
 from databricks_mcp.config import get_workspace_client
@@ -285,5 +287,95 @@ def register_tools(mcp: FastMCP) -> None:
             w = get_workspace_client()
             export = w.jobs.export_run(run_id)
             return to_json(export)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_update_job(job_id: int, new_settings: str) -> str:
+        """Update the settings of an existing job.
+
+        Replaces the job settings with the provided configuration. Use
+        databricks_get_job to retrieve the current settings, modify them,
+        and pass the updated JSON back.
+
+        Args:
+            job_id: The unique numeric identifier of the job to update.
+            new_settings: JSON string containing the new job settings.
+                          Must be a valid JobSettings object serialized as JSON.
+                          Example: '{"name": "updated-job", "timeout_seconds": 3600}'
+        """
+        try:
+            from databricks.sdk.service.jobs import JobSettings
+
+            w = get_workspace_client()
+            parsed = json.loads(new_settings)
+            settings = JobSettings.from_dict(parsed)
+            w.jobs.update(job_id=job_id, new_settings=settings)
+            return to_json({
+                "status": "updated",
+                "job_id": job_id,
+                "message": f"Job {job_id} settings have been updated.",
+            })
+        except json.JSONDecodeError as e:
+            return format_error(ValueError(f"Invalid JSON in 'new_settings' parameter: {e}"))
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_cancel_all_runs(job_id: int) -> str:
+        """Cancel all active runs of a job.
+
+        Sends cancellation requests for all currently active runs of the
+        specified job. Runs are cancelled asynchronously, so they may
+        still appear as RUNNING briefly after this call.
+
+        Args:
+            job_id: The unique numeric identifier of the job whose runs
+                    should be cancelled.
+        """
+        try:
+            w = get_workspace_client()
+            w.jobs.cancel_all_runs(job_id=job_id)
+            return to_json({
+                "status": "cancelling",
+                "job_id": job_id,
+                "message": (
+                    f"Cancellation requested for all active runs of job {job_id}. "
+                    "Use databricks_list_runs to verify termination."
+                ),
+            })
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_repair_run(run_id: int, rerun_tasks: str = "") -> str:
+        """Repair a failed job run by re-running specific tasks.
+
+        Re-executes failed or skipped tasks within a completed run. This is
+        useful for recovering from transient failures without re-running the
+        entire job. Only tasks in a FAILED, TIMED_OUT, or CANCELED state
+        can be repaired.
+
+        Args:
+            run_id: The unique numeric identifier of the run to repair.
+            rerun_tasks: Comma-separated list of task keys to re-run
+                         (e.g. "task_1,task_2,task_3"). If empty, all
+                         failed tasks are re-run.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {"run_id": run_id}
+            if rerun_tasks:
+                kwargs["rerun_tasks"] = [t.strip() for t in rerun_tasks.split(",") if t.strip()]
+            result = w.jobs.repair_run(**kwargs)
+            return to_json({
+                "status": "repairing",
+                "run_id": run_id,
+                "repair_id": getattr(result, "repair_id", None),
+                "message": (
+                    f"Repair initiated for run {run_id}. "
+                    "Use databricks_get_run to check progress."
+                ),
+            })
         except Exception as e:
             return format_error(e)

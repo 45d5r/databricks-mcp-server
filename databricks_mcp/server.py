@@ -10,7 +10,9 @@ mcp = FastMCP(
     "databricks",
     description="Comprehensive MCP server for Databricks. Provides tools for Unity Catalog, SQL, "
     "compute, jobs, pipelines, serving endpoints, vector search, apps, Lakebase, dashboards, "
-    "Genie, secrets, IAM, connections, experiments, and Delta Sharing.",
+    "Genie, secrets, IAM, connections, experiments, Delta Sharing, files (DBFS & Volumes), "
+    "grants, storage credentials, external locations, metastores, online tables, global init "
+    "scripts, tokens, Git credentials, quality monitors, and command execution.",
 )
 
 # Register tool modules conditionally based on DATABRICKS_MCP_TOOLS_INCLUDE/EXCLUDE
@@ -32,6 +34,16 @@ _TOOL_MODULES = [
     ("connections", "databricks_mcp.tools.connections"),
     ("experiments", "databricks_mcp.tools.experiments"),
     ("sharing", "databricks_mcp.tools.sharing"),
+    ("files", "databricks_mcp.tools.files"),
+    ("grants", "databricks_mcp.tools.grants"),
+    ("storage", "databricks_mcp.tools.storage"),
+    ("metastores", "databricks_mcp.tools.metastores"),
+    ("online_tables", "databricks_mcp.tools.online_tables"),
+    ("global_init_scripts", "databricks_mcp.tools.global_init_scripts"),
+    ("tokens", "databricks_mcp.tools.tokens"),
+    ("git_credentials", "databricks_mcp.tools.git_credentials"),
+    ("quality_monitors", "databricks_mcp.tools.quality_monitors"),
+    ("command_execution", "databricks_mcp.tools.command_execution"),
 ]
 
 

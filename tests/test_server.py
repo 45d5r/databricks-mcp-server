@@ -185,9 +185,9 @@ class TestMain:
 class TestToolModulesList:
     """Verify the module registry is complete and well-formed."""
 
-    def test_all_17_modules_listed(self) -> None:
+    def test_all_27_modules_listed(self) -> None:
         server_mod = _import_server_fresh()
-        assert len(server_mod._TOOL_MODULES) == 17
+        assert len(server_mod._TOOL_MODULES) == 27
 
     def test_module_paths_match_names(self) -> None:
         """Each module path should end with the module name."""
@@ -201,13 +201,15 @@ class TestToolModulesList:
             assert path.startswith("databricks_mcp.tools.")
 
     def test_expected_modules_present(self) -> None:
-        """All 17 expected module names are present in the list."""
+        """All 27 expected module names are present in the list."""
         server_mod = _import_server_fresh()
         names = {name for name, _ in server_mod._TOOL_MODULES}
         expected = {
             "unity_catalog", "sql", "workspace", "compute", "jobs",
             "pipelines", "serving", "vector_search", "apps", "database",
             "dashboards", "genie", "secrets", "iam", "connections",
-            "experiments", "sharing",
+            "experiments", "sharing", "files", "grants", "storage",
+            "metastores", "online_tables", "global_init_scripts", "tokens",
+            "git_credentials", "quality_monitors", "command_execution",
         }
         assert names == expected

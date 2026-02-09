@@ -234,3 +234,179 @@ def register_tools(mcp: FastMCP) -> None:
             return f"Parameter '{key}={value}' logged for run '{run_id}'."
         except Exception as e:
             return format_error(e)
+
+    @mcp.tool()
+    def databricks_create_run(
+        experiment_id: str,
+        run_name: str = "",
+        start_time: int = 0,
+    ) -> str:
+        """Create a new MLflow run within an experiment.
+
+        Creates a run to track an ML training iteration. After creation,
+        use databricks_log_metric and databricks_log_param to record
+        metrics and parameters, and databricks_update_run to mark the
+        run as finished.
+
+        Args:
+            experiment_id: The numeric ID of the experiment to create the
+                           run in.
+            run_name: Optional display name for the run. If empty, MLflow
+                      assigns a random name.
+            start_time: Optional Unix timestamp in milliseconds for the
+                        run start time. If 0, the current time is used.
+
+        Returns:
+            JSON object with the created run's details including run_id.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {"experiment_id": experiment_id}
+            if run_name:
+                kwargs["run_name"] = run_name
+            if start_time > 0:
+                kwargs["start_time"] = start_time
+            result = w.experiments.create_run(**kwargs)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_update_run(
+        run_id: str,
+        status: str = "",
+        end_time: int = 0,
+    ) -> str:
+        """Update the status of an MLflow run.
+
+        Typically used to mark a run as FINISHED, FAILED, or KILLED after
+        training completes. Can also set the end time.
+
+        Args:
+            run_id: The UUID of the run to update.
+            status: New status for the run. Valid values: "RUNNING",
+                    "SCHEDULED", "FINISHED", "FAILED", "KILLED".
+                    If empty, the status is not changed.
+            end_time: Optional Unix timestamp in milliseconds for the run
+                      end time. If 0, the end time is not set.
+
+        Returns:
+            JSON object with the updated run info.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {"run_id": run_id}
+            if status:
+                from databricks.sdk.service.ml import UpdateRunStatus
+                kwargs["status"] = UpdateRunStatus(status)
+            if end_time > 0:
+                kwargs["end_time"] = end_time
+            result = w.experiments.update_run(**kwargs)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_delete_run(run_id: str) -> str:
+        """Mark an MLflow run as deleted (soft delete).
+
+        The run is moved to a trash state and can be restored within the
+        retention period. The caller must be the run owner or a workspace
+        admin.
+
+        Args:
+            run_id: The UUID of the run to delete.
+
+        Returns:
+            Confirmation message on success.
+        """
+        try:
+            w = get_workspace_client()
+            w.experiments.delete_run(run_id=run_id)
+            return f"Run '{run_id}' deleted successfully."
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_restore_experiment(experiment_id: str) -> str:
+        """Restore a previously deleted MLflow experiment.
+
+        Recovers an experiment that was soft-deleted via
+        databricks_delete_experiment. All runs within the experiment
+        are also restored.
+
+        Args:
+            experiment_id: The numeric ID of the experiment to restore.
+
+        Returns:
+            Confirmation message on success.
+        """
+        try:
+            w = get_workspace_client()
+            w.experiments.restore_experiment(experiment_id=experiment_id)
+            return f"Experiment '{experiment_id}' restored successfully."
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_search_experiments(
+        filter_string: str = "",
+        max_results: int = 25,
+    ) -> str:
+        """Search for MLflow experiments using filter expressions.
+
+        Supports filtering by experiment attributes and tags using the
+        MLflow search syntax.
+
+        Args:
+            filter_string: Optional filter expression. Examples:
+                           - 'name = "my-experiment"'
+                           - 'tags.team = "ml-eng"'
+                           - 'attributes.lifecycle_stage = "active"'
+                           Leave empty to return all experiments.
+            max_results: Maximum number of experiments to return
+                         (default 25).
+
+        Returns:
+            JSON array of matching experiment objects with experiment_id,
+            name, artifact_location, lifecycle_stage, and tags.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {"max_results": max_results}
+            if filter_string:
+                kwargs["filter_string"] = filter_string
+            results = paginate(
+                w.experiments.search_experiments(**kwargs),
+                max_items=max_results,
+            )
+            return to_json(results)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_list_artifacts(run_id: str, path: str = "") -> str:
+        """List artifacts associated with an MLflow run.
+
+        Returns the files and directories stored as artifacts for the
+        specified run. Artifacts include model files, data files, plots,
+        and any other files logged during the run.
+
+        Args:
+            run_id: The UUID of the run whose artifacts to list.
+            path: Optional relative path within the artifact directory.
+                  If empty, lists artifacts at the root level.
+
+        Returns:
+            JSON array of artifact objects, each containing file_path,
+            is_dir, and file_size.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {"run_id": run_id}
+            if path:
+                kwargs["path"] = path
+            results = paginate(w.experiments.list_artifacts(**kwargs))
+            return to_json({"run_id": run_id, "artifacts": results, "count": len(results)})
+        except Exception as e:
+            return format_error(e)

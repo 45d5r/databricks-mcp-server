@@ -310,3 +310,59 @@ def register_tools(mcp: FastMCP) -> None:
             return to_json(response)
         except Exception as e:
             return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_vector_search_index(index_name: str) -> str:
+        """Get detailed information about a specific vector search index.
+
+        Returns the index configuration including type (DELTA_SYNC or
+        DIRECT_ACCESS), status, endpoint, primary key, embedding source,
+        and sync pipeline details.
+
+        Args:
+            index_name: Full three-level name of the index
+                        (catalog.schema.index_name).
+
+        Returns:
+            JSON object with full index details including name, endpoint_name,
+            index_type, primary_key, and status.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.vector_search_indexes.get_index(index_name=index_name)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_sync_vector_search_index(index_name: str) -> str:
+        """Trigger a sync of a DELTA_SYNC vector search index.
+
+        Forces the index to re-sync with its source Delta table. This is
+        useful when the source table has been updated and you want the
+        index to reflect the latest data immediately rather than waiting
+        for the next scheduled sync.
+
+        Only applicable to DELTA_SYNC indexes. DIRECT_ACCESS indexes do
+        not support this operation.
+
+        Args:
+            index_name: Full three-level name of the index
+                        (catalog.schema.index_name).
+
+        Returns:
+            Confirmation that the sync has been initiated.
+        """
+        try:
+            w = get_workspace_client()
+            w.vector_search_indexes.sync_index(index_name=index_name)
+            return to_json({
+                "status": "syncing",
+                "index_name": index_name,
+                "message": (
+                    f"Sync initiated for vector search index '{index_name}'. "
+                    "Use databricks_get_vector_search_index to check sync status."
+                ),
+            })
+        except Exception as e:
+            return format_error(e)

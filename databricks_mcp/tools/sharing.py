@@ -146,3 +146,143 @@ def register_tools(mcp: FastMCP) -> None:
             return to_json(result)
         except Exception as e:
             return format_error(e)
+
+    @mcp.tool()
+    def databricks_update_share(name: str, comment: str = "", owner: str = "") -> str:
+        """Update properties of an existing Delta Sharing share.
+
+        The caller must be the share owner or a metastore admin. Only
+        non-empty fields are updated; other fields remain unchanged.
+
+        Args:
+            name: The name of the share to update.
+            comment: Optional new description for the share. If empty,
+                     the comment is not changed.
+            owner: Optional new owner for the share. If empty, the owner
+                   is not changed.
+
+        Returns:
+            JSON object with the updated share's details.
+        """
+        try:
+            w = get_workspace_client()
+            kwargs: dict = {}
+            if comment:
+                kwargs["comment"] = comment
+            if owner:
+                kwargs["owner"] = owner
+            if not kwargs:
+                return to_json({
+                    "status": "no_change",
+                    "message": "No fields provided to update. Specify comment and/or owner.",
+                })
+            result = w.shares.update(name=name, **kwargs)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_delete_share(name: str) -> str:
+        """Delete a Delta Sharing share.
+
+        Permanently removes the share. Recipients who had access to this
+        share will no longer be able to query its tables. The underlying
+        tables are not affected.
+
+        Args:
+            name: The name of the share to delete.
+
+        Returns:
+            Confirmation message on success.
+        """
+        try:
+            w = get_workspace_client()
+            w.shares.delete(name)
+            return f"Share '{name}' deleted successfully."
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_recipient(name: str) -> str:
+        """Get detailed information about a specific Delta Sharing recipient.
+
+        Returns the recipient definition including authentication type,
+        activation status, sharing tokens, and associated shares.
+
+        Args:
+            name: The name of the recipient to retrieve.
+
+        Returns:
+            JSON object with full recipient details including name,
+            authentication_type, comment, activation_url, and tokens.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.recipients.get(name)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_delete_recipient(name: str) -> str:
+        """Delete a Delta Sharing recipient.
+
+        Permanently removes the recipient. They will no longer be able to
+        access any shares they were previously granted. This action cannot
+        be undone.
+
+        Args:
+            name: The name of the recipient to delete.
+
+        Returns:
+            Confirmation message on success.
+        """
+        try:
+            w = get_workspace_client()
+            w.recipients.delete(name)
+            return f"Recipient '{name}' deleted successfully."
+        except Exception as e:
+            return format_error(e)
+
+    # -- Providers ---------------------------------------------------------
+
+    @mcp.tool()
+    def databricks_list_providers() -> str:
+        """List all Delta Sharing providers in the metastore.
+
+        Providers represent external organizations that share data with
+        your metastore via Delta Sharing. Each provider can expose one
+        or more shares.
+
+        Returns:
+            JSON array of provider objects, each containing name, comment,
+            authentication_type, and recipient profile information.
+            Results are capped at 100 items.
+        """
+        try:
+            w = get_workspace_client()
+            results = paginate(w.providers.list())
+            return to_json(results)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_provider(name: str) -> str:
+        """Get detailed information about a specific Delta Sharing provider.
+
+        Returns the provider definition including authentication type,
+        recipient profile, and available shares.
+
+        Args:
+            name: The name of the provider to retrieve.
+
+        Returns:
+            JSON object with full provider details including name, comment,
+            authentication_type, and recipient_profile.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.providers.get(name)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)

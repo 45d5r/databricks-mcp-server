@@ -287,7 +287,10 @@ def register_tools(mcp: FastMCP) -> None:
         """
         try:
             w = get_workspace_client()
-            result = w.apps.get_environment(name=name)
-            return to_json(result)
+            if hasattr(w.apps, 'get_environment'):
+                result = w.apps.get_environment(name=name)
+                return to_json(result)
+            else:
+                return format_error(Exception("get_environment not available in this SDK version"))
         except Exception as e:
             return format_error(e)

@@ -2,7 +2,7 @@
 
 A comprehensive [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for Databricks, built on the official [Databricks Python SDK](https://github.com/databricks/databricks-sdk-py).
 
-Provides **157 tools** across 17 service domains, giving AI assistants full access to the Databricks platform.
+Provides **257 tools** across 27 service domains, giving AI assistants full access to the Databricks platform.
 
 <p align="center">
   <img src="assets/demo.gif" alt="Databricks MCP Server Demo" width="800">
@@ -224,23 +224,33 @@ If your MCP client struggles with 157 tools, use selective loading to reduce the
 
 | Module | Tools | Description |
 |--------|-------|-------------|
-| `unity_catalog` | 19 | Catalogs, schemas, tables, volumes, functions, models |
+| `unity_catalog` | 23 | Catalogs, schemas, tables, volumes, functions, registered models |
 | `sql` | 14 | Warehouses, SQL execution, queries, alerts, history |
 | `workspace` | 10 | Notebooks, files, repos |
-| `compute` | 10 | Clusters, instance pools, policies |
-| `jobs` | 10 | Jobs, runs, tasks |
+| `compute` | 18 | Clusters, instance pools, policies, node types, Spark versions |
+| `jobs` | 13 | Jobs, runs, tasks, repair, cancel all |
 | `pipelines` | 8 | DLT / Lakeflow pipelines |
-| `serving` | 9 | Serving endpoints, model versions |
-| `vector_search` | 8 | Vector search endpoints and indexes |
+| `serving` | 10 | Serving endpoints, model versions, OpenAPI |
+| `vector_search` | 10 | Vector search endpoints, indexes, sync |
 | `apps` | 10 | Databricks Apps lifecycle |
 | `database` | 10 | Lakebase PostgreSQL instances |
-| `dashboards` | 8 | Lakeview AI/BI dashboards |
+| `dashboards` | 9 | Lakeview AI/BI dashboards, published views |
 | `genie` | 5 | Genie AI/BI conversations |
 | `secrets` | 8 | Secret scopes and secrets |
-| `iam` | 10 | Users, groups, service principals, permissions |
+| `iam` | 16 | Users, groups, service principals, permissions, current user |
 | `connections` | 5 | External connections |
-| `experiments` | 8 | MLflow experiments and runs |
-| `sharing` | 5 | Delta Sharing providers and recipients |
+| `experiments` | 14 | MLflow experiments, runs, artifacts, metrics, params |
+| `sharing` | 11 | Delta Sharing shares, recipients, providers |
+| `files` | 12 | DBFS and UC Volumes file operations |
+| `grants` | 3 | Unity Catalog permission grants (GRANT/REVOKE) |
+| `storage` | 10 | Storage credentials and external locations |
+| `metastores` | 8 | Unity Catalog metastore management |
+| `online_tables` | 3 | Online tables for low-latency serving |
+| `global_init_scripts` | 5 | Workspace-wide init scripts |
+| `tokens` | 5 | Personal access token management |
+| `git_credentials` | 5 | Git credential management for repos |
+| `quality_monitors` | 8 | Data quality monitoring and refreshes |
+| `command_execution` | 4 | Interactive command execution on clusters |
 
 ## Selective Tool Loading
 

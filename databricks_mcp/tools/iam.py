@@ -8,6 +8,8 @@ access control.
 
 from __future__ import annotations
 
+import json
+
 from mcp.server.fastmcp import FastMCP
 
 from databricks_mcp.config import get_workspace_client
@@ -281,5 +283,155 @@ def register_tools(mcp: FastMCP) -> None:
                 request_object_id=object_id,
             )
             return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    # -- Current User ------------------------------------------------------
+
+    @mcp.tool()
+    def databricks_get_current_user() -> str:
+        """Get information about the currently authenticated user.
+
+        Returns the identity of the user or service principal making the
+        API call. Useful for verifying authentication and determining the
+        caller's user ID, name, and group memberships.
+
+        Returns:
+            JSON object with the current user's details including id,
+            userName, displayName, active status, and groups.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.current_user.me()
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_group(group_id: str) -> str:
+        """Get detailed information about a specific group.
+
+        Args:
+            group_id: The numeric ID of the group to retrieve.
+
+        Returns:
+            JSON object with full group details including id, displayName,
+            members, roles, and entitlements.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.groups.get(group_id)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_service_principal(id: str) -> str:
+        """Get detailed information about a specific service principal.
+
+        Args:
+            id: The numeric ID of the service principal to retrieve.
+
+        Returns:
+            JSON object with full service principal details including id,
+            displayName, applicationId, active status, and entitlements.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.service_principals.get(id)
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_delete_service_principal(id: str) -> str:
+        """Delete a service principal from the workspace.
+
+        The caller must be a workspace admin. This removes the service
+        principal's access but does not delete resources it owns.
+
+        Args:
+            id: The numeric ID of the service principal to delete.
+
+        Returns:
+            Confirmation message on success.
+        """
+        try:
+            w = get_workspace_client()
+            w.service_principals.delete(id)
+            return f"Service principal '{id}' deleted successfully."
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_get_permissions(object_type: str, object_id: str) -> str:
+        """Get the access control list (ACL) for a workspace object.
+
+        Returns the current permissions assigned to users, groups, and
+        service principals for the specified object.
+
+        Args:
+            object_type: The type of object to query permissions for.
+                         Common values: "clusters", "cluster-policies",
+                         "directories", "experiments", "jobs",
+                         "notebooks", "pipelines", "registered-models",
+                         "repos", "serving-endpoints", "sql/warehouses".
+            object_id: The ID of the specific object. Format varies by
+                       object type.
+
+        Returns:
+            JSON object containing the object_id, object_type, and an
+            access_control_list array with user/group permissions.
+        """
+        try:
+            w = get_workspace_client()
+            result = w.permissions.get(
+                request_object_type=object_type,
+                request_object_id=object_id,
+            )
+            return to_json(result)
+        except Exception as e:
+            return format_error(e)
+
+    @mcp.tool()
+    def databricks_set_permissions(object_type: str, object_id: str, access_control_list: str) -> str:
+        """Set permissions on a workspace object.
+
+        Replaces the entire access control list (ACL) for the specified
+        object. All existing permissions not included in the new ACL will
+        be removed.
+
+        Args:
+            object_type: The type of object to set permissions on.
+                         Common values: "clusters", "cluster-policies",
+                         "directories", "experiments", "jobs",
+                         "notebooks", "pipelines", "registered-models",
+                         "repos", "serving-endpoints", "sql/warehouses".
+            object_id: The ID of the specific object. Format varies by
+                       object type.
+            access_control_list: JSON string containing an array of access
+                                 control entries. Each entry should have
+                                 "user_name" or "group_name" and
+                                 "permission_level". Example:
+                                 '[{"user_name": "user@example.com",
+                                   "permission_level": "CAN_MANAGE"}]'
+
+        Returns:
+            JSON object with the updated permissions for the object.
+        """
+        try:
+            from databricks.sdk.service.iam import AccessControlRequest
+
+            w = get_workspace_client()
+            parsed = json.loads(access_control_list)
+            acl = [AccessControlRequest.from_dict(entry) for entry in parsed]
+            result = w.permissions.set(
+                request_object_type=object_type,
+                request_object_id=object_id,
+                access_control_list=acl,
+            )
+            return to_json(result)
+        except json.JSONDecodeError as e:
+            return format_error(ValueError(f"Invalid JSON in 'access_control_list' parameter: {e}"))
         except Exception as e:
             return format_error(e)
