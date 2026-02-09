@@ -254,7 +254,39 @@ If your MCP client struggles with 157 tools, use selective loading to reduce the
 
 ## Selective Tool Loading
 
-Control which tool modules are loaded via environment variables:
+With 257 tools, it's recommended to load only the modules you need. This improves agent performance and tool selection accuracy.
+
+### Role-Based Presets (Recommended)
+
+Pick a preset that matches your role:
+
+| Preset | Modules | Tools | Config |
+|--------|---------|-------|--------|
+| **Data Engineer** | unity_catalog, sql, compute, jobs, pipelines, files, quality_monitors | ~100 | `DATABRICKS_MCP_TOOLS_INCLUDE=unity_catalog,sql,compute,jobs,pipelines,files,quality_monitors` |
+| **ML Engineer** | serving, vector_search, experiments, compute, unity_catalog, online_tables, files | ~98 | `DATABRICKS_MCP_TOOLS_INCLUDE=serving,vector_search,experiments,compute,unity_catalog,online_tables,files` |
+| **Platform Admin** | iam, secrets, tokens, metastores, compute, global_init_scripts, grants, storage | ~85 | `DATABRICKS_MCP_TOOLS_INCLUDE=iam,secrets,tokens,metastores,compute,global_init_scripts,grants,storage` |
+| **App Developer** | apps, database, sql, files, serving, secrets | ~64 | `DATABRICKS_MCP_TOOLS_INCLUDE=apps,database,sql,files,serving,secrets` |
+| **Data Analyst** | sql, unity_catalog, dashboards, genie, workspace | ~61 | `DATABRICKS_MCP_TOOLS_INCLUDE=sql,unity_catalog,dashboards,genie,workspace` |
+| **Minimal** | sql, unity_catalog | ~37 | `DATABRICKS_MCP_TOOLS_INCLUDE=sql,unity_catalog` |
+
+Example using a preset in Claude Code:
+
+```json
+{
+  "mcpServers": {
+    "databricks": {
+      "command": "databricks-mcp",
+      "env": {
+        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
+        "DATABRICKS_TOKEN": "dapi...",
+        "DATABRICKS_MCP_TOOLS_INCLUDE": "unity_catalog,sql,compute,jobs,pipelines,files,quality_monitors"
+      }
+    }
+  }
+}
+```
+
+### Custom Filtering
 
 ```bash
 # Only include specific modules
@@ -266,11 +298,35 @@ export DATABRICKS_MCP_TOOLS_EXCLUDE=iam,sharing,experiments
 
 If `INCLUDE` is set, only those modules load. If `EXCLUDE` is set, everything except those modules loads. `INCLUDE` takes precedence if both are set.
 
-## MCP Resources
+## Tool Discovery (For AI Agents)
+
+The server includes built-in tool discovery to help AI agents find the right tools:
+
+### MCP Resources
 
 | URI | Description |
 |-----|-------------|
 | `databricks://workspace/info` | Workspace URL, current user, auth type |
+| `databricks://tools/guide` | Tool catalog with module descriptions, use cases, and role presets |
+
+Agents can read `databricks://tools/guide` at connection time to understand what's available.
+
+### Discovery Tool
+
+The `databricks_tool_guide` tool helps agents find the right tools during a conversation:
+
+```
+# Find tools for a specific task
+databricks_tool_guide(task="run a SQL query")
+databricks_tool_guide(task="deploy an ML model")
+databricks_tool_guide(task="create a user")
+
+# Get role-based recommendations
+databricks_tool_guide(role="data_engineer")
+databricks_tool_guide(role="ml_engineer")
+```
+
+This returns matching modules with descriptions and usage hints, so the agent knows exactly which `databricks_*` tools to call.
 
 ## Development
 
